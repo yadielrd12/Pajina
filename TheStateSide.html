@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The City Creative</title>
+  <link rel="shortcut icon" href="img3/logo.png" type="image/x-icon">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      /* Consider a more suitable gaming/tech font - keeping Arial for now */
+       font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background-color: #000; /* Base black background */
+      color: white;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 100px; /* Add more padding at the bottom for the larger footer */
+    }
+
+    /* Background effects container */
+    .background-effects {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1; /* Ensure it's behind content */
+      pointer-events: none; /* Don't block mouse events */
+    }
+
+    /* Style for the floating orbs (pink balls) */
+    .floating-orb {
+      position: absolute;
+      bottom: 0; /* Start from the bottom */
+      border-radius: 50%;
+      /* Initial color - a vibrant pink */
+      background-color: rgba(255, 105, 180, 0.7); /* Hot pink with transparency */
+      filter: blur(4px); /* Add some blur to make them look softer */
+      opacity: 0; /* Start invisible */
+      pointer-events: none; /* Don't block mouse events */
+    }
+
+
+    /* --- Navbar Styles --- */
+    .navbar {
+      display: flex;
+      justify-content: space-between; /* Distribute space */
+      align-items: center;
+      background-color: #1a1821; /* Dark background color */
+      border-radius: 40px; /* Rounded corners */
+      width: 95%; /* Slightly less than full width */
+      margin: 1rem auto; /* Center horizontally and add margin */
+      padding: 0.8rem 2rem; /* Internal padding */
+      position: relative;
+      z-index: 10; /* Ensure navbar is above background */
+      flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    .logo-link {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0; /* Prevent logo from shrinking */
+    }
+
+    .logo-small {
+      height: 60px; /* Adjusted logo size for nav bar */
+      transition: transform 0.3s;
+    }
+
+    .logo-small:hover {
+      transform: scale(1.1);
+    }
+
+    .nav-links-group { /* Group for Inicio and Aplicaciones */
+      display: flex;
+      gap: 1.5rem; /* Space between links */
+      align-items: center;
+      flex-grow: 1; /* Allow this group to take up available space */
+      justify-content: center; /* Center the links within the available space */
+      flex-wrap: wrap; /* Allow links to wrap */
+    }
+
+    .nav-buttons-group { /* Group for Discord and Whitelist */
+        display: flex;
+        gap: 0.8rem; /* Space between buttons */
+        align-items: center;
+        flex-shrink: 0; /* Prevent buttons from shrinking */
+        flex-wrap: wrap; /* Allow buttons to wrap */
+        justify-content: center; /* Center buttons if they wrap */
+    }
+
+    .nav-link {
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem; /* Space between icon and text */
+      transition: all 0.3s;
+      position: relative;
+      padding: 5px 0; /* Padding for underline effect */
+      white-space: nowrap; /* Prevent text wrapping */
+      font-size: 1.1em; /* Slightly larger font for readability */
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: #7e008a; /* Underline color */
+      transition: width 0.3s;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-link:hover {
+      color: #ae00b4; /* Hover color for text */
+    }
+
+    .icon-img {
+      width: 24px; /* Icon size */
+      height: 24px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* Style for all icons in the navigation links (Inicio, Aplicaciones, Discord) to make them purple */
+    .nav-links-group .icon-img,
+    .discord-btn-wrapper .icon-img {
+        /* Apply filter to turn icon purple */
+        /* This filter combination is a common way to color monochrome icons */
+        filter: sepia(100%) saturate(2000%) hue-rotate(250deg); /* Adjust values for desired purple */
+        transition: filter 0.3s; /* Smooth transition for filter */
+    }
+
+     /* Hover effect for purple icons */
+     .nav-link:hover .icon-img,
+     .discord-btn-wrapper:hover .icon-img {
+         filter: sepia(100%) saturate(2500%) hue-rotate(250deg) brightness(1.2); /* More saturated/bright purple on hover */
+     }
+
+
+    /* Styles for the Discord button container */
+    .discord-btn-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px; /* Fixed width for the rounded button */
+        height: 40px; /* Fixed height for the rounded button */
+        border: 1px solid rgba(255, 255, 255, 0.3); /* Light border */
+        border-radius: 50%; /* Make it fully rounded */
+        background-color: transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0; /* Remove potential padding */
+    }
+
+     /* Style for the icon specifically inside the Discord button */
+    .discord-btn-wrapper .icon-img {
+        width: 24px; /* Slightly larger icon for button */
+        height: 24px;
+        margin: 0; /* Remove margin from general icon style */
+        /* Filter applied above with other purple icons */
+    }
+
+    .discord-btn-wrapper:hover {
+        border-color: #fff; /* Brighter border on hover */
+        background-color: rgba(255, 255, 255, 0.1); /* Subtle background on hover */
+        box-shadow: 0 0 8px rgba(174, 0, 180, 0.5); /* Subtle glow */
+    }
+
+
+    /* Styles for the Whitelist button */
+    .whitelist-btn {
+      display: flex;
+      align-items: center;
+      background-color: transparent;
+      color: #F0D9D9; /* Light pinkish text color */
+      border: 1px solid #F0D9D9; /* Light pinkish border color */
+      border-radius: 50px; /* Rounded corners */
+      padding: 0.5rem 1.5rem; /* Padding for the button */
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+
+    .whitelist-btn:hover {
+      background-color: rgba(240, 217, 217, 0.1); /* Subtle pinkish background on hover */
+      border-color: #fff; /* Brighter border on hover */
+      color: #fff; /* Brighter text on hover */
+      box-shadow: 0 0 10px rgba(240, 217, 217, 0.5); /* Subtle glow */
+    }
+
+     /* Glitter effect on hover */
+    .whitelist-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(240, 217, 217, 0.4), transparent);
+      transition: all 0.6s;
+    }
+
+    .whitelist-btn:hover::before {
+      left: 100%;
+    }
+    /* --- End Navbar Styles --- */
+
+
+    /* Main content */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      min-height: calc(100vh - 70px - 100px); /* Adjust based on navbar and footer height */
+      text-align: center;
+      position: relative;
+      z-index: 1; /* Ensure content is above background */
+    }
+
+    .main-logo {
+      width: 50%;
+      max-width: 300px;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 0 10px rgba(216, 49, 231, 0.7));
+      animation: logoAnimation 8s infinite ease-in-out;
+    }
+
+    @keyframes logoAnimation {
+      0% {
+        filter: drop-shadow(0 0 10px rgba(255, 3, 200, 0.7));
+        transform: scale(1);
+      }
+      25% {
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.9));
+        transform: scale(1.03);
+      }
+      50% {
+        filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+        transform: scale(1.05);
+      }
+      75% {
+        filter: drop-shadow(0 0 20px rgba(255, 2, 234, 0.9));
+        transform: scale(1.03);
+      }
+      100% {
+        filter: drop-shadow(0 0 10px rgba(255, 0, 212, 0.7));
+        transform: scale(1);
+      }
+    }
+
+    .welcome-title {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-weight: bold;
+      position: relative;
+      display: inline-block;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    .description {
+      max-width: 800px;
+      line-height: 1.6;
+      font-size: 1.1rem;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out forwards;
+      animation-delay: 1s;
+    }
+
+    /* --- Footer Styles --- */
+    .footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #121118; /* Darker color for the footer */
+      /* Add animated gradient background */
+      background: linear-gradient(90deg, #121118, #1a1821, #121118);
+      background-size: 200% 100%; /* Make gradient wider than container */
+      animation: gradientMove 15s infinite linear; /* Animated gradient */
+
+      color: #888; /* Lighter gray text */
+      text-align: center;
+      padding: 30px 10px; /* Increased padding for a taller footer */
+      font-size: 0.9rem;
+      z-index: 5; /* Ensure footer is above background effects */
+      overflow: hidden; /* Hide animation overflow */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer-content {
+       position: relative; /* Position relative for z-index */
+       z-index: 2; /* Ensure text is above animation */
+       padding: 0 20px; /* Add some horizontal padding */
+       white-space: nowrap; /* Prevent text wrapping */
+    }
+
+    /* Footer Animation Styles */
+    .footer-animation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1; /* Below the content */
+        pointer-events: none; /* Don't block clicks */
+    }
+
+    .stars {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .star {
+        position: absolute;
+        width: 3px; /* Slightly larger stars */
+        height: 3px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        opacity: 0;
+        /* Combine twinkling and subtle upward float */
+        animation: twinkleAndFloat 10s infinite ease-in-out;
+    }
+
+    /* Position stars randomly (added more for a denser effect) */
+    .star:nth-child(1) { top: 10%; left: 20%; animation-delay: 1s; }
+    .star:nth-child(2) { top: 30%; left: 5%; animation-delay: 3s; }
+    .star:nth-child(3) { top: 50%; left: 30%; animation-delay: 5s; }
+    .star:nth-child(4) { top: 70%; left: 15%; animation-delay: 7s; }
+    .star:nth-child(5) { top: 20%; left: 40%; animation-delay: 2s; }
+    .star:nth-child(6) { top: 40%; left: 60%; animation-delay: 4s; }
+    .star:nth-child(7) { top: 60%; left: 85%; animation-delay: 6s; }
+    .star:nth-child(8) { top: 80%; left: 70%; animation-delay: 8s; }
+    .star:nth-child(9) { top: 25%; left: 75%; animation-delay: 2.5s; }
+    .star:nth-child(10) { top: 55%; left: 90%; animation-delay: 5.5s; }
+    .star:nth-child(11) { top: 85%; left: 50%; animation-delay: 9s; }
+    .star:nth-child(12) { top: 5%; left: 50%; animation-delay: 0.5s; }
+    .star:nth-child(13) { top: 15%; left: 95%; animation-delay: 1.5s; }
+    .star:nth-child(14) { top: 45%; left: 5%; animation-delay: 4.5s; }
+    .star:nth-child(15) { top: 75%; left: 95%; animation-delay: 7.5s; }
+    .star:nth-child(16) { top: 90%; left: 10%; animation-delay: 9.5s; }
+    .star:nth-child(17) { top: 35%; left: 25%; animation-delay: 3.5s; }
+    .star:nth-child(18) { top: 65%; left: 40%; animation-delay: 6.5s; }
+    .star:nth-child(19) { top: 95%; left: 80%; animation-delay: 8.5s; }
+    .star:nth-child(20) { top: 5%; left: 80%; animation-delay: 0.2s; }
+    .star:nth-child(21) { top: 12%; left: 60%; animation-delay: 1.2s; }
+    .star:nth-child(22) { top: 28%; left: 35%; animation-delay: 3.2s; }
+    .star:nth-child(23) { top: 42%; left: 98%; animation-delay: 5.2s; }
+    .star:nth-child(24) { top: 58%; left: 7%; animation-delay: 7.2s; }
+    .star:nth-child(25) { top: 72%; left: 55%; animation-delay: 2.2s; }
+    .star:nth-child(26) { top: 88%; left: 25%; animation-delay: 4.2s; }
+    .star:nth-child(27) { top: 8%; left: 35%; animation-delay: 6.2s; }
+    .star:nth-child(28) { top: 22%; left: 88%; animation-delay: 8.2s; }
+    .star:nth-child(29) { top: 38%; left: 12%; animation-delay: 0.8s; }
+    .star:nth-child(30) { top: 52%; left: 65%; animation-delay: 2.8s; }
+    .star:nth-child(31) { top: 68%; left: 45%; animation-delay: 4.8s; }
+    .star:nth-child(32) { top: 82%; left: 92%; animation-delay: 6.8s; }
+    .star:nth-child(33) { top: 4%; left: 15%; animation-delay: 9.8s; }
+    .star:nth-child(34) { top: 18%; left: 50%; animation-delay: 0.4s; }
+    .star:nth-child(35) { top: 32%; left: 85%; animation-delay: 1.8s; }
+    .star:nth-child(36) { top: 48%; left: 2%; animation-delay: 3.8s; }
+    .star:nth-child(37) { top: 62%; left: 78%; animation-delay: 5.8s; }
+    .star:nth-child(38) { top: 78%; left: 30%; animation-delay: 7.8s; }
+    .star:nth-child(39) { top: 92%; left: 60%; animation-delay: 9.2s; }
+    .star:nth-child(40) { top: 2%; left: 70%; animation-delay: 0.1s; }
+
+
+    .glow {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(174, 0, 180, 0.3) 0%, rgba(18,17,24,0) 70%); /* Purple glow */
+        animation: pulse 15s infinite ease-in-out alternate;
+        filter: blur(8px); /* More blur for softer glow */
+        pointer-events: none;
+        opacity: 0.4; /* Make glows more visible */
+    }
+
+    /* Position and size glows randomly, adjusted sizes/positions */
+    .glow:nth-child(1) {
+        width: 300px; height: 300px;
+        bottom: 20px; left: 5%; /* Position relative to footer bottom */
+        animation-delay: 0s;
+    }
+     .glow:nth-child(2) {
+        width: 250px; height: 250px;
+        bottom: 50px; left: 60%; /* Position relative to footer bottom */
+        animation-delay: 5s;
+        background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, rgba(18,17,24,0) 70%); /* Cyan glow variant */
+    }
+     .glow:nth-child(3) {
+        width: 400px; height: 400px;
+        bottom: 0px; left: 30%; /* Position relative to footer bottom */
+        animation-delay: 10s;
+         background: radial-gradient(circle, rgba(255, 0, 255, 0.3) 0%, rgba(18,17,24,0) 70%); /* Magenta glow variant */
+    }
+
+
+    /* Animation Keyframes */
+     /* fadeInUp remains for text */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Combined animation for stars: twinkle and subtle float */
+    @keyframes twinkleAndFloat {
+      0%, 100% { opacity: 0; transform: translateY(0); }
+      30% { opacity: 0.8; } /* Visible and still */
+      60% { opacity: 0.2; transform: translateY(-10px); } /* Fading slightly and floating up */
+      80% { opacity: 0.5; transform: translateY(0px); } /* Fading back and descending */
+    }
+
+    /* Pulse for footer glows */
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.4; }
+        50% { transform: scale(1.1); opacity: 0.7; } /* Pulse more visibly */
+        100% { transform: scale(1); opacity: 0.4; }
+    }
+
+    /* Animation for footer background gradient */
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .navbar {
+          flex-direction: column; /* Stack items vertically */
+          gap: 0.5rem; /* Reduced gap */
+          padding: 0.8rem 1rem; /* Reduced padding */
+          width: 98%;
+          border-radius: 20px; /* Smaller radius on small screens */
+          align-items: stretch; /* Stretch items to fill width */
+      }
+
+      .logo-link {
+         justify-content: center; /* Center logo */
+         width: 100%; /* Take full width */
+         margin-bottom: 0.5rem; /* Space below logo */
+      }
+       .logo-small {
+           height: 50px; /* Smaller logo on small screens */
+       }
+
+      .nav-links-group {
+          flex-direction: column; /* Stack links vertically */
+          gap: 0.5rem; /* Reduced gap between vertical links */
+          justify-content: center; /* Center stacked links */
+          flex-grow: 0; /* Don't grow when stacked */
+          width: 100%; /* Take full width */
+          margin-bottom: 0.5rem; /* Space below links group */
+      }
+
+      .nav-buttons-group { /* The right group with buttons */
+           flex-direction: row; /* Keep buttons side-by-side */
+           gap: 0.5rem; /* Reduced gap between buttons */
+           justify-content: center; /* Center buttons horizontally */
+           width: 100%; /* Take full width */
+           margin-top: 0.5rem; /* Space above buttons group */
+      }
+
+      .nav-link {
+          font-size: 1em; /* Slightly smaller font on small screens */
+          padding: 3px 0;
+      }
+
+      .icon-img {
+           width: 22px; /* Adjust icon size for small screens */
+           height: 22px;
+       }
+
+       .discord-btn-wrapper {
+           width: 35px;
+           height: 35px;
+       }
+        .discord-btn-wrapper .icon-img {
+           width: 20px; /* Adjust icon size for small screens */
+           height: 20px;
+       }
+
+       .whitelist-btn {
+           padding: 0.4rem 1rem;
+           font-size: 0.9rem;
+       }
+
+      .main-content {
+          padding: 1rem;
+          min-height: calc(100vh - 150px - 100px); /* Adjust min-height for stacked navbar + footer */
+      }
+
+      .welcome-title {
+        font-size: 2rem;
+      }
+
+      .description {
+        font-size: 1rem;
+      }
+
+      .footer {
+          padding: 20px 10px; /* Adjust padding for responsiveness */
+          height: auto; /* Allow height to be determined by content and padding */
+      }
+      .footer-content {
+         white-space: normal; /* Allow text wrapping on small screens */
+      }
+      .glow { /* Reduce size of glows on small screens */
+           width: 150px; height: 150px;
+      }
+       /* Adjust glow positioning for smaller footer */
+      .glow:nth-child(1) { bottom: 10px; left: 5%; }
+      .glow:nth-child(2) { bottom: 30px; left: 60%; }
+      .glow:nth-child(3) { bottom: 0px; left: 30%; }
+
+      .star { /* Slightly smaller stars on mobile */
+          width: 2px;
+          height: 2px;
+      }
+    }
+     @media (max-width: 480px) {
+        .navbar {
+             padding: 0.8rem 0.5rem;
+        }
+         .nav-links-group,
+         .nav-buttons-group {
+             gap: 0.3rem; /* Even less gap on very small screens */
+         }
+          .whitelist-btn {
+             padding: 0.3rem 0.8rem;
+             font-size: 0.8rem;
+          }
+           .discord-btn-wrapper {
+             width: 30px;
+             height: 30px;
+           }
+            .discord-btn-wrapper .icon-img {
+               width: 18px; height: 18px;
+            }
+     }
+  </style>
+</head>
+<body>
+
+  <!-- Use a single container for background effects -->
+  <div class="background-effects" id="background-effects-container"></div>
+
+  <nav class="navbar">
+    <a href="#" class="logo-link">
+      <img src="img3/logo.png" alt="Creativos RP Logo pequeño" class="logo-small">
+    </a>
+    <!-- Combined the link groups -->
+    <div class="nav-links-group">
+      <a href="#" class="nav-link">
+        <img src="img3/1.png" alt="Icono Inicio" class="icon-img">
+        Inicio
+      </a>
+      <a class='nav-link' href='/carto'>
+        <img src="img3/2.png" alt="Icono Aplicaciones" class="icon-img">
+        Aplicaciones
+      </a>
+    </div>
+     <!-- Kept the button group separate -->
+    <div class="nav-buttons-group">
+      <!-- Added wrapper div for Discord icon to style it as a button -->
+      <a href="https://discord.gg/ksjZ5VRExg" class="discord-btn-wrapper" target="_blank" rel="noopener noreferrer">
+        <img src="img4/3.png" alt="Discord Icon" class="icon-img">
+      </a>
+      <a href="pregunta wl.html" class="whitelist-btn">Whitelist Entrada</a>
+    </div>
+  </nav>
+
+
+  <main class="main-content">
+    <img src="img3/logo.png" alt="The StateSide Logo" class="main-logo">
+    <h1 class="welcome-title">¡The StateSides!</h1>
+    <p class="description">
+      ¿Estás listo para sumergirte en un mundo de creatividad e innovación? En The StateSide, no solo encontrarás un
+      lugar donde jugar, sino también un espacio para expresar tu creatividad al máximo. Nuestro servidor está
+      dedicado a la creación de contenido único con scripts exclusivos y una administración comprometida que trabaja
+      arduamente para brindarte la mejor experiencia de rol posible.
+    </p>
+  </main>
+
+  <!-- Script for background effects -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.getElementById('background-effects-container');
+      const maxOrbs = 50; // Max number of orbs on screen at once
+
+      function createOrb() {
+        if (container.children.length >= maxOrbs) {
+          // If we already have max orbs, wait a bit before creating a new one
+          setTimeout(createOrb, Math.random() * 500 + 100); // Wait between 100ms and 600ms
+          return;
+        }
+
+        const orb = document.createElement('div');
+        orb.classList.add('floating-orb');
+
+        const size = Math.random() * 20 + 5; // Orbs size between 5px and 25px
+        orb.style.width = `${size}px`;
+        orb.style.height = `${size}px`;
+
+        // Position the orb randomly along the bottom of the screen, slightly off-screen
+        const posX = Math.random() * 100; // Percentage from left
+        orb.style.left = `${posX}%`;
+        orb.style.bottom = `-${size / 2}px`; // Start slightly below the viewport edge
+
+        // Add it to the container
+        container.appendChild(orb);
+
+        // Determine animation duration and distance
+        const duration = Math.random() * 8000 + 4000; // Duration between 4s and 12s
+        const floatHeight = window.innerHeight * (Math.random() * 0.4 + 0.8); // Float to 80%-120% of viewport height
+
+        // Define the animation using the Web Animations API
+        const orbAnimation = orb.animate(
+          [
+            { // Start (0%) - Invisible at the bottom, small
+              transform: `translateY(0) scale(1)`,
+              opacity: 0,
+              backgroundColor: 'rgba(255, 105, 180, 0.7)', // Pink color
+              easing: 'ease-out'
+            },
+            { // Mid-float (around 10%) - Become visible, float up, stay pink
+              transform: `translateY(-${floatHeight * 0.1}px) scale(1)`,
+              opacity: Math.random() * 0.4 + 0.4, // Become partially visible
+              backgroundColor: 'rgba(255, 105, 180, 0.7)',
+              easing: 'linear' // Linear movement upwards
+            },
+             { // Pre-Explosion (around 85%) - Reaches top area, still pink
+              transform: `translateY(-${floatHeight}px) scale(1)`,
+              opacity: Math.random() * 0.4 + 0.4,
+              backgroundColor: 'rgba(255, 105, 180, 0.7)',
+              easing: 'ease-in' // Slow down slightly before exploding
+            },
+            { // Explosion (100%) - Goes off screen, scales up, turns white, fades out
+              transform: `translateY(-${floatHeight + size * 3}px) scale(${Math.random() * 2 + 2})`, // Scale up significantly
+              opacity: 0, // Fade out completely
+              backgroundColor: 'rgba(255, 255, 255, 1)', // Turn white
+              easing: 'ease-out'
+            }
+          ],
+          {
+            duration: duration, // Use the calculated duration
+            fill: 'forwards' // Keep the final state after animation
+          }
+        );
+
+        // Remove the orb element after the animation finishes
+        orbAnimation.onfinish = () => {
+          orb.remove();
+          // Immediately schedule creation of a new orb
+          // This maintains a consistent flow without needing setInterval
+          createOrb();
+        };
+
+         // Handle potential animation cancellation (e.g., window resize before finish)
+         orbAnimation.oncancel = () => {
+             orb.remove();
+         };
+      }
+
+      // Start creating orbs periodically
+      // Use a loop with initial delays to spread them out
+      for (let i = 0; i < maxOrbs; i++) {
+           setTimeout(createOrb, i * (8000 / maxOrbs)); // Distribute initial creation over a few seconds
+      }
+
+        // Add a listener for window resize to remove elements
+        // This prevents animation glitches if dimensions change mid-animation
+        window.addEventListener('resize', () => {
+             container.innerHTML = ''; // Clear all orbs
+             // Re-start the creation process after resize settles (optional, can remove this if preferred)
+             // setTimeout(() => {
+             //      for (let i = 0; i < maxOrbs; i++) {
+             //           setTimeout(createOrb, i * (8000 / maxOrbs));
+             //      }
+             // }, 500); // Wait 500ms before recreating
+        });
+
+    });
+  </script>
+
+  <!-- Footer HTML -->
+  <footer class="footer">
+    <div class="footer-animation">
+      <div class="stars">
+        <!-- Increased number of stars for a denser effect -->
+        <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div>
+        <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div>
+        <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div>
+        <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div>
+         <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div>
+        <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div>
+        <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div>
+        <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div> <div class="star"></div>
+      </div>
+      <!-- Glows are now positioned relative to the footer area -->
+      <div class="glow"></div>
+      <div class="glow"></div>
+      <div class="glow"></div>
+    </div>
+    <div class="footer-content">
+                                © 2025 THE STATESIDE ROLEPLAY | PROGRAMER JORGE
+    </div>
+  </footer>
+  <!-- End of Footer HTML -->
+
+</body>
+</html>
